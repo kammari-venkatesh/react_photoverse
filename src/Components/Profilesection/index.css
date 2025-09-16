@@ -1,0 +1,247 @@
+/* Profile Container */
+.profile-container {
+  background: #0e1411;
+  color: #fff;
+  min-height: 100vh;
+  padding: 2rem;
+  margin-top: 100px;
+  font-family: Arial, sans-serif;
+}
+
+.profile-email{
+    font-size: 1rem;
+    color: #aaa;
+    margin-top: 0.25rem;
+}
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 10px 20px;
+  flex-wrap: wrap; /* allow wrapping on smaller screens */
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.profile-username {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.profile-uploads {
+  font-size: 1rem;
+  color: #aaa;
+  margin-top: 0.25rem;
+}
+
+.profile-logout {
+  background: transparent;
+  border: 1px solid #d9534f;
+  color: #d9534f;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-logout:hover {
+  background: #d9534f;
+  color: white;
+}
+.profile-photos-grid{
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+/* Divider */
+.profile-divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  margin: 2rem 0;
+}
+
+/* Photos Section */
+.profile-photos-section {
+  margin-top: 1.5rem;
+  
+}
+
+.profile-photos-title {
+  font-size: x-large;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.profile-photo-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.photo-actions-overlay {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  display: flex;
+  gap: 15px;
+  padding: 2px 4px;
+  border-radius: 6px;
+
+}
+
+.photo-btn {
+  background:white;
+  transform: scale(1.2);
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.photo-btn:hover {
+  background: rgb(161, 220, 237);
+}
+
+
+
+
+
+
+
+.profile-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.profile-photo {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-photo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .profile-username {
+    font-size: 1.5rem;
+  }
+  .profile-photo {
+    height: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  .profile-logout {
+    margin-top: 1rem;
+  }
+  .profile-photos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .profile-photo {
+    height: 150px;
+  }
+  
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+  }
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+  }
+  .profile-username {
+    font-size: 1.2rem;
+  }
+  .profile-uploads {
+    font-size: 0.9rem;
+  }
+  .profile-photos-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .profile-photo {
+    height: 120px;
+  }
+}
+
+@media(min-width:768px){
+    .profile-background {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  .profile-avatar{
+        width: 120px;
+        height: 120px;
+    }
+    .profile-info{
+        margin-left: 1rem;
+        flex: 2;
+    }
+    .profile-photo{
+        height: 180px;
+    }
+}
+@media(min-width:1024px){
+    .profile-avatar{
+        width: 150px;
+        height: 150px;
+    }
+    .profile-photo{
+        height: 250px;
+    }
+    .profile-photos-grid{
+      grid-template-columns: repeat(5, 1fr);
+      padding: 30px;
+      gap: 20px;
+    }
+    .profile-photos-title{
+      font-size: xx-large;
+      
+      margin-left: 40px;
+    }
+}
