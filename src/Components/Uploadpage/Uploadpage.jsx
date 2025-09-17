@@ -9,20 +9,27 @@ const UploadPage = () => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [title, setTitle] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchtags = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch("http://127.0.0.1:8000/api/tags");
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched tags:", data);
-          setTags(data.tags); // ✅ store tags in state
+          setTags(data.tags || []); // ✅ store tags in state with fallback
         } else {
           console.error("Failed to fetch tags:", response.statusText);
+          setError("Failed to load tags. Please refresh the page.");
         }
       } catch (error) {
         console.error("Error fetching tags:", error);
+        setError("Failed to load tags. Please refresh the page.");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -47,6 +54,14 @@ const UploadPage = () => {
         setError('File size must be less than 10MB');
         return;
       }
+
+      // Check file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(selectedFile.type)) {
+        setError('Please upload a valid image file (JPG, PNG, or GIF)');
+        return;
+      }
+
       setError('');
       setFile(selectedFile);
       setProgress(0);
@@ -73,39 +88,95 @@ const UploadPage = () => {
   };
 
 const handlePublish = async () => {
+  console.log("🚀 handlePublish called");
+
+  // ✅ Step 1: Check file
   if (!file) {
+    console.warn("⚠️ No file selected");
     setError("Please select a file");
     return;
   }
+  console.log("📂 File selected:", file);
 
+  // ✅ Step 2: Check title
+  if (!title.trim()) {
+    console.warn("⚠️ No title entered");
+    setError("Please enter a title for your photo");
+    return;
+  }
+  console.log("📝 Title entered:", title.trim());
+
+  // ✅ Step 3: Check token
+  const token = Cookies.get("token");
+  if (!token) {
+    console.warn("⚠️ No auth token found");
+    setError("Please log in to upload photos");
+    return;
+  }
+  console.log("🔑 Token found:", token);
+
+  setIsUploading(true);
+  setError("");
+  console.log("⏳ Upload started...");
+
+  // ✅ Step 4: Build FormData
   const formData = new FormData();
   formData.append("photo", file);
-  formData.append("title", title || "Untitled");
+  formData.append("title", title.trim());
+  formData.append("user_id", Cookies.get("userid"));
 
-  // Append tags correctly as array
-  selectedTags.forEach(tag => formData.append("tags[]", tag));
+  console.log("🏷️ Selected tags:", selectedTags);
+  selectedTags.forEach((tag, index) => {
+    console.log(`➡️ Appending tag[${index}]:`, tag);
+    formData.append("tags[]", tag);
+  });
+
+  // Debug: show FormData content
+  for (let [key, value] of formData.entries()) {
+    console.log(`📦 FormData entry -> ${key}:`, value);
+  }
 
   try {
+    console.log("📤 Sending FormData with fetch...");
+
     const response = await fetch("http://127.0.0.1:8000/api/photos", {
       method: "POST",
-      body: formData, // ✅ DO NOT set Content-Type manually
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        // ❌ Don’t set Content-Type manually
+      },
+      body: formData,
     });
 
-    const result = await response.json();
-    console.log("✅ Upload result:", result);
+    console.log("📥 Server responded:", response.status);
 
     if (response.ok) {
+      const result = await response.json();
+      console.log("✅ Upload success:", result);
+
       setProgress(100);
       setError("");
-      alert("Photo uploaded successfully!");
+
+      // Reset form
+      console.log("🔄 Resetting form...");
+      setFile(null);
+      setTitle("");
+      setSelectedTags([]);
+      setProgress(0);
     } else {
-      setError(result.message || "Upload failed");
+      const errorData = await response.json().catch(() => ({}));
+      console.error("❌ Upload failed:", errorData);
+      setError(errorData.message || "Upload failed");
     }
   } catch (err) {
-    console.error("❌ Upload error:", err);
+    console.error("❌ Exception caught in handlePublish:", err);
     setError("Upload failed. Please try again.");
+  } finally {
+    setIsUploading(false);
   }
 };
+
 
 
 
@@ -133,9 +204,10 @@ const handlePublish = async () => {
               <input
                 id="fileInput"
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/gif"
                 hidden
                 onChange={handleFileChange}
+                onClick={(e) => e.target.value = null} // Reset file input on click
               />
               <div className="upload-icon">☁️</div>
               <p>{file ? file.name : "Drag & drop a file or click to upload"}</p>
@@ -155,7 +227,9 @@ const handlePublish = async () => {
 
               {/* ✅ Checkboxes for tags */}
               <div className="tag-list">
-                {tags.length > 0 ? (
+                {isLoading ? (
+                  <p>Loading tags...</p>
+                ) : tags.length > 0 ? (
                   tags.map((tag) => (
                     <label key={tag.id} className="tag-checkbox">
                       <input
@@ -190,7 +264,7 @@ const handlePublish = async () => {
 
               <button 
                 className="publish-btn" 
-                disabled={!file || (progress > 0 && progress < 100)}
+                disabled={!file || isUploading || !title.trim()}
                 onClick={handlePublish}
               >
                 Publish Photo

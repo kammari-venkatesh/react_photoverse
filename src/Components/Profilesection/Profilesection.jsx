@@ -13,6 +13,7 @@ export default function Profile() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [userPhotos, setUserPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const handleLogout = () => {
     Cookies.remove("token");
@@ -69,8 +70,13 @@ export default function Profile() {
 }, [user]);
 useEffect(() => {
 const fetchuserphotos = async () => {
+    setIsLoading(true);
     try{
         const token = Cookies.get("token");
+        if (!token) {
+          console.error("No token found");
+          return;
+        }
         const response = await fetch(`http://127.0.0.1:8000/api/userphotos/${user}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,18 +84,21 @@ const fetchuserphotos = async () => {
         });
         if (response.ok) {
           const data = await response.json();
-          setUserPhotos(data.photos);
+          setUserPhotos(data.photos || []);
           console.log("User photos fetched successfully:", data);
         } else {
           console.error("Failed to fetch user photos:", response.statusText);
+          setUserPhotos([]);
         }
       } catch (error) {
         console.error("Error fetching user photos:", error);
+        setUserPhotos([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchuserphotos();
-
-  },[userPhotos.length,user]);
+  },[user]); // Remove userPhotos.length from dependencies
 
   return (
     <>
@@ -108,7 +117,7 @@ const fetchuserphotos = async () => {
         <div className="profile-info">
           <h2 className="profile-username">{username}</h2>
           <p className="profile-email">{email}</p>
-          <p className="profile-uploads">{userPhotos.length} Uploads</p>
+          <p className="profile-uploads">{userPhotos ? userPhotos.length : 0} Uploads</p>
         </div>
         </div>
         <button className="profile-logout" onClick={handleLogout}>Logout</button>
@@ -120,7 +129,9 @@ const fetchuserphotos = async () => {
       <div className="profile-photos-section">
         <h3 className="profile-photos-title">Photos</h3>
         <div className="profile-photos-grid">
-        {userPhotos.length > 0 ? (
+        {isLoading ? (
+          <div className="loading">Loading photos...</div>
+        ) : userPhotos.length > 0 ? (
   userPhotos.map((photo) => (
     <div key={photo.id} className="profile-photo-wrapper">
       <img
@@ -137,7 +148,7 @@ const fetchuserphotos = async () => {
     </div>
   ))
 ) : (
-  <p>No photos uploaded yet.</p>
+  <p className="no-photos">No photos uploaded yet.</p>
 )}
 
         </div>
