@@ -4,9 +4,11 @@ import './index.css'
 import Header from '../Header/Header';
 import { Link } from 'react-router';
 const Explorepage = () => {
-  const [selectedTag, setSelectedTag] = useState('All');
+  const [selectedTagId, setSelectedTagId] = useState('All');
   const [showMoreTags, setShowMoreTags] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [allphotos, setAllphotos] = useState([]);
+  
   const [exploreTags, setExploreTags] = useState([]);
   
 
@@ -22,7 +24,13 @@ useEffect(() => {
           }
         }
       );
+      console.log('response', response);
+      if(!response.ok) {
+        console.error('Network response was not ok', response.statusText);
+        throw new Error('Network response was not ok');
+      }
       const data = await response.json();
+      setAllphotos(data.photos);
       setPhotos(data.photos);
       console.log(data);
     } catch (error) {
@@ -36,6 +44,7 @@ getphotos();
 
   useEffect(() => {
     const fetchtags = async () => {
+    
       try {
         const response = await fetch("http://127.0.0.1:8000/api/tags");
         if (response.ok) {
@@ -56,12 +65,29 @@ getphotos();
 
 
 
+useEffect(() => {
 
-console.log(exploreTags);
+const fetchPhotosByTag = async (selectedTagId) => {
+    try {
+      if (selectedTagId === 'All') {
+        setPhotos(allphotos);
+        return;
+      }
 
+      const response = await fetch(`http://127.0.0.1:8000/api/photobytag/${selectedTagId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setPhotos(data.photos);
+      } else {
+        console.error("Failed to fetch photos by tag:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching photos by tag:", error);
+    }
+  };
 
-
-
+  fetchPhotosByTag(selectedTagId);
+}, [selectedTagId]);
 
 
   
@@ -75,12 +101,19 @@ console.log(exploreTags);
   //   'Architecture', 'Sunset', 'Flowers', 'Wildlife', 'Travel', 
   //   'Street', 'Portrait', 'Landscape'
   // ];
+const handlesearch = (e) => {
+  const term = e.target.value.toLowerCase().trim();
 
+  const filtered = allphotos.filter(photo =>
+    photo.title.toLowerCase().includes(term)
+  );
+
+  setPhotos(filtered);
+};
+
+  
   const visibleTags = showMoreTags ? exploreTags : exploreTags.slice(0, 9);
 
-  // const filteredPhotos = selectedTag === 'All'
-  //   ? photos
-  //   : photos.filter(photo => photo.title === selectedTag);
 
   return (
     <div className="photoverse-container">
@@ -93,18 +126,33 @@ console.log(exploreTags);
           <p className="explore-description">
             Discover incredible new photos from the PhotoVerse community.
           </p>
-        </div>
+            <div className='search-right'>
+          <div className="search-container">
+            <Search className="search-icon" size={18} />
+            <input
+              type="text"
+              onChange={handlesearch}
+              placeholder="Search Photos, Galleries..."
+              className="search-input"
+            />
+          </div>
+          </div>
 
+        </div>
+      
         {/* Browse by Tags */}
      <section className="tags-section">
   <h2 className="tags-title">Browse by Tags</h2>
   <div className="tags-container">
     <div className="tags-list">
+      <button className={`tag-btn ${selectedTagId === 'All' ? 'active' : ''}`}
+       onClick={() => setSelectedTagId('All')}>All</button>
       {visibleTags.map((tag) => (
-        <button
+        
+        <button 
           key={tag.id}
-          className={`tag-btn ${selectedTag === tag.name ? 'active' : ''}`}
-          onClick={() => setSelectedTag(tag.name)}
+          className={`tag-btn ${selectedTagId === tag.id ? 'active' : ''}`}
+          onClick={() => setSelectedTagId(tag.id)}
         >
           {tag.name}
         </button>

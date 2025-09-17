@@ -593,7 +593,14 @@ body {
   text-decoration: none;
   color: inherit;
 }
-
+.search-right{
+  
+  display: flex;
+  justify-content: center;
+margin-top: 20px;}
+.search-container{
+  display: flex !important;
+}
 .tag-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -685,6 +692,12 @@ body {
   .gallery-card:nth-child(7) {
     grid-row: span 1;
   }
+  .search-right{
+  
+  display: flex;
+  justify-content: flex-end;
+}
+
 }
 
 .gallery-card {

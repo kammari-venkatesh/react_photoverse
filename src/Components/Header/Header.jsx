@@ -23,14 +23,7 @@ const Header = () => {
 
         {/* Right Side: Search + Mobile Menu Toggle */}
         <div className="nav-right">
-          <div className="search-container">
-            <Search className="search-icon" size={18} />
-            <input
-              type="text"
-              placeholder="Search Photos, Galleries..."
-              className="search-input"
-            />
-          </div>
+        
 
           {/* Mobile Menu Toggle */}
           <button

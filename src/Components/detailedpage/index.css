@@ -19,6 +19,23 @@ body {
   padding: 40px;
   border-radius: 8px;
   margin-top: 50px;
+}.username{
+  font-weight: 600;
+  color: #dddddd;
+}
+.photo-date{
+  font-size: 1rem;
+  color: #aaaaaa;
+  margin-bottom: 10px;
+}
+.photo-uploader{
+  font-size: 1rem;
+  color: #aaaaaa;
+  margin-bottom: 10px;
+}
+.tags-title{
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 .photo {
