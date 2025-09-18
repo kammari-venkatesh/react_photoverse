@@ -1,7 +1,7 @@
 import { Search, Menu, X } from 'lucide-react';
 import './index.css';
 import Header from '../Header/Header';
-
+import { Link } from 'react-router';
 const Home = () => {
   const featuredPhotos = [
     {
@@ -75,8 +75,8 @@ const Home = () => {
             fellow creators.
           </p>
           <div className="home-hero-buttons">
-            <button className="home-btn-primary">Explore Now</button>
-            <button className="home-btn-secondary">Learn More</button>
+            <Link to="/explore"><button className="home-btn-primary">Explore Now</button></Link>
+            {/* <button className="home-btn-secondary">Learn More</button> */}
           </div>
         </div>
       </section>
