@@ -42,10 +42,16 @@ export default function Profile() {
       if (response.ok) {
         setUserPhotos((prevPhotos) => prevPhotos.filter((photo) => photo.id !== photoId));
         console.log("Photo deleted successfully");
-      } else {
+      }
+        else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
         console.error("Failed to delete photo:", response.statusText);
       }
     } catch (error) {
+      if (error.message === "rate-limited ") {
+        navigate("/ratelimiter", { replace: true });
+      }
       console.error("Error deleting photo:", error);
     }
   };
@@ -64,10 +70,16 @@ const handleEdit = async(photoId) => {
         setPhotodetails(data.photo);
         console.log("Fetched photo data:", data);
         // Populate your form fields with the fetched data
-      } else {
+      }
+        else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
         console.error("Failed to fetch photo data:", response.statusText);
       }
     } catch (error) {
+      if (error.message === "rate-limited ") {
+        navigate("/ratelimiter", { replace: true });
+      }
       console.error("Error fetching photo data:", error);
     }
   };
@@ -83,10 +95,16 @@ const handleEdit = async(photoId) => {
           console.log("Fetched tags:", data);
           
           setCategories(data.tags); // ✅ store tags in state
-        } else {
+        }
+          else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
           console.error("Failed to fetch tags:", response.statusText);
         }
       } catch (error) {
+        if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
         console.error("Error fetching tags:", error);
       }
     };
@@ -127,7 +145,7 @@ const handleEdit = async(photoId) => {
        }
      } catch (error) {
       if (error.message === "rate-limited ") {
-        navigate("/");
+        navigate("/ratelimiter", { replace: true });
       }
        console.error("Error fetching user data:", error);
      }
@@ -152,11 +170,17 @@ const fetchuserphotos = async () => {
           const data = await response.json();
           setUserPhotos(data.photos || []);
           console.log("User photos fetched successfully:", data);
-        } else {
+        }
+          else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
           console.error("Failed to fetch user photos:", response.statusText);
           setUserPhotos([]);
         }
       } catch (error) {
+        if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
         console.error("Error fetching user photos:", error);
         setUserPhotos([]);
       } finally {
@@ -197,11 +221,18 @@ const handleUpdateSubmit = async (e) => {
       setUserPhotos((prev) =>
         prev.map((p) => (p.id === photodetails.id ? data.photo : p))
       );
-    } else {
+    }  else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } 
+    else {
       const errorData = await response.json();
       console.error("Failed to update photo:", errorData);
     }
   } catch (error) {
+    if(error.message === "rate-limited ") {
+      navigate("/ratelimiter", { replace: true });
+    }
+    
     console.error("Error updating photo:", error);
   }
 };

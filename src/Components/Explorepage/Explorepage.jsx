@@ -3,9 +3,11 @@ import { Search, Menu, X, ChevronDown } from 'lucide-react';
 import './index.css'
 import Header from '../Header/Header';
 import { Link } from 'react-router';
+import { useNavigate } from 'react-router';
 const Explorepage = () => {
   const [selectedTagId, setSelectedTagId] = useState('All');
   const [showMoreTags, setShowMoreTags] = useState(false);
+  const navigate = useNavigate();
   const [photos, setPhotos] = useState([]);
   const [allphotos, setAllphotos] = useState([]);
   
@@ -29,11 +31,17 @@ useEffect(() => {
         console.error('Network response was not ok', response.statusText);
         throw new Error('Network response was not ok');
       }
+        else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       }
       const data = await response.json();
       setAllphotos(data.photos);
       setPhotos(data.photos);
       console.log(data);
     } catch (error) {
+      if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
       console.error('Error fetching photos:', error);
     }
   }
@@ -52,10 +60,15 @@ getphotos();
           console.log("Fetched tags:", data);
           
           setExploreTags(data.tags); // ✅ store tags in state
-        } else {
+        }  else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
           console.error("Failed to fetch tags:", response.statusText);
         }
       } catch (error) {
+        if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
         console.error("Error fetching tags:", error);
       }
     };
@@ -78,10 +91,15 @@ const fetchPhotosByTag = async (selectedTagId) => {
       if (response.ok) {
         const data = await response.json();
         setPhotos(data.photos);
-      } else {
+      }   else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       }else {
         console.error("Failed to fetch photos by tag:", response.statusText);
       }
     } catch (error) {
+      if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
       console.error("Error fetching photos by tag:", error);
     }
   };

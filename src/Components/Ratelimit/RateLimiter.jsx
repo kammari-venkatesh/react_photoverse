@@ -1,9 +1,24 @@
 import React from 'react';
-
-// To apply the styles, make sure to link to 'index.css' in your main HTML file.
-// Also, add the 'rate-limiter-body' class to your <body> tag for the background.
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import './index.css';
+import {Link} from 'react-router';
 const RateLimiter = () => {
+  const [timer, setTimer] = useState(40)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (timer <= 0) {
+      navigate('/home', { replace: true });
+      return; // Stop when timer hits 0
+    }
+
+    const interval = setInterval(() => {
+      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [timer]);
+
   return (
     <div className="rate-limiter-page">
       <div className="rate-limiter-card">
@@ -45,7 +60,10 @@ const RateLimiter = () => {
           You've made too many requests in a short time. Please wait and try
           again later.
         </p>
-        <button className="retry-button">Retry</button>
+        <h2 className="suggestion-title">Try again after: {timer} seconds</h2>
+        <Link to="/home">
+          <button className="retry-button">Retry</button>
+        </Link>
       </div>
       <p className="footer-text">© 2025 PhotoVerse</p>
     </div>

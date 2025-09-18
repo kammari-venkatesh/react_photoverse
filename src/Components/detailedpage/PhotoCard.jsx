@@ -4,12 +4,14 @@ import Header from '../Header/Header';
 import { useParams } from "react-router";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router";
 
 export default function PhotoCard() {
   const { id } = useParams();
   const [photoDetails, setPhotoDetails] = useState(null);
   const [userid, setUserid] = useState('');
   const [username, setUsername] = useState('');
+  const navigate = useNavigate();
   const [tags, setTags] = useState([]);
 
   useEffect(() => {
@@ -27,10 +29,17 @@ export default function PhotoCard() {
           console.log(data);
           setUserid(data.photo.user_id);
           console.log(data);
-        } else {
+        }
+         else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       }
+         else {
           console.error("Failed to fetch photo details:", response.statusText);
         }
       } catch (error) {
+        if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
         console.error("Error fetching photo details:", error);
       }
     };
@@ -54,10 +63,16 @@ export default function PhotoCard() {
          const data = await response.json();
          console.log("User data fetched successfully:", data);
          setUsername(data.user.username);
+       }
+         else if (response.status === 429) {
+         throw new Error("rate-limited ");
        } else {
          console.error("Failed to fetch user data:", response.statusText);
        }
      } catch (error) {
+       if (error.message === "rate-limited ") {
+         navigate("/ratelimiter", { replace: true });
+       }
        console.error("Error fetching user data:", error);
      }
    };

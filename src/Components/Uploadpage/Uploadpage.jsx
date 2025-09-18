@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import Header from "../Header/Header";
 import "./index.css";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router";
 
 const UploadPage = () => {
   // --- STATE MANAGEMENT ---
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -24,11 +26,16 @@ const UploadPage = () => {
         if (response.ok) {
           const data = await response.json();
           setTags(data.tags || []); // Set tags, with a fallback for safety
-        } else {
+        }  else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
           console.error("Failed to fetch tags:", response.statusText);
           setError("Failed to load tags. Please refresh the page.");
         }
       } catch (error) {
+        if (error.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+        }
         console.error("Error fetching tags:", error);
         setError("A network error occurred while loading tags.");
       } finally {
@@ -150,10 +157,15 @@ const UploadPage = () => {
             setSelectedTags([]);
             setProgress(0);
         }, 1500);
-      } else {
+      }  else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       } else {
         setError(result.message || "An unknown error occurred during upload.");
       }
     } catch (err) {
+      if(err.message === "rate-limited ") {
+          navigate("/ratelimiter", { replace: true });
+      }
       console.error("An error occurred during the upload:", err);
       setError("Upload failed due to a network error. Please check your connection and try again.");
     } finally {
