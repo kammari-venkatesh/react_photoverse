@@ -93,7 +93,6 @@ const handleEdit = async(photoId) => {
     fetchtags();
   }, [setShowEditModal]);
 
-console.log('photodetails:', photodetails);
 
 
 
