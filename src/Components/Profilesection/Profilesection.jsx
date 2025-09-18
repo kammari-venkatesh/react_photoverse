@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import { AiOutlineEdit } from "react-icons/ai";
 import { RiDeleteBin3Line } from "react-icons/ri";
 
+
 export default function Profile() {
   const user = Cookies.get("userid") ? JSON.parse(Cookies.get("userid")) : null;
 
@@ -117,10 +118,17 @@ const handleEdit = async(photoId) => {
          console.log("User data fetched successfully:", data);
          setUsername(data.user.username);
             setEmail(data.user.email);
-       } else {
+       }
+       else if (response.status === 429) {
+         throw new Error("rate-limited ");
+       }
+       else {
          console.error("Failed to fetch user data:", response.statusText);
        }
      } catch (error) {
+      if (error.message === "rate-limited ") {
+        navigate("/");
+      }
        console.error("Error fetching user data:", error);
      }
    };

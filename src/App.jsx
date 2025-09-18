@@ -8,6 +8,7 @@ import Uploadpage from "./Components/Uploadpage/Uploadpage";
 import Profilesection from "./Components/Profilesection/Profilesection";
 import PhotoCard from "./Components/detailedpage/Photocard";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
+import RateLimiter from "./Components/Ratelimit/RateLimiter";
 export default function App() {
   return (
     <BrowserRouter>
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/upload" element={<ProtectedRoute><Uploadpage/></ProtectedRoute>}/>
         <Route path="/profile" element={<ProtectedRoute><Profilesection/></ProtectedRoute>}/>
         <Route path="/photo/:id" element={<ProtectedRoute><PhotoCard/></ProtectedRoute>}/>
+        <Route path="/ratelimiter" element={<RateLimiter />} />
       </Routes>
     </BrowserRouter>
     
